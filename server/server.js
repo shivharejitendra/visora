@@ -15,7 +15,21 @@ app.use(exppress.json());
 app.use(cors());
 await connectDB();
 
+// ⚠️ ADD THIS CORS MIDDLEWARE
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",                // local dev
+      "https://your-frontend-name.vercel.app" // update later when Vercel is live
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
+// (optional, but sometimes helps with preflight)
+app.options("*", cors());
 app.use('/api/user',userRouter);
 app.use('/api/image',imageRouter);
 app.get('/', (req, res) => res.send("API WORKING FINE"))
