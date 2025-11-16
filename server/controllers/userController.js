@@ -77,13 +77,14 @@ const loginUser = async (req, res) => {
 };
 
 // =============== CREDITS ===============
-
 const userCredits = async (req, res) => {
   try {
     const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : null;
+
+    let token = null;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1]?.trim();
+    }
 
     if (!token) {
       return res
@@ -127,6 +128,7 @@ const userCredits = async (req, res) => {
       .json({ success: false, message: error.message });
   }
 };
+
 
 // =============== RAZORPAY SETUP ===============
 
@@ -192,7 +194,6 @@ const paymentRazorpay = async (req, res) => {
         credits = 100;
         amount = 10;
         break;
-
       case "advance":
       case "advanced":
       case "advance-plan":
@@ -200,14 +201,12 @@ const paymentRazorpay = async (req, res) => {
         credits = 500;
         amount = 50;
         break;
-
       case "business":
       case "business-plan":
         plan = "Business";
         credits = 5000;
         amount = 250;
         break;
-
       default:
         return res
           .status(400)
@@ -251,6 +250,7 @@ const paymentRazorpay = async (req, res) => {
       .json({ success: false, message: error.message });
   }
 };
+
 
 
 // =============== VERIFY PAYMENT & ADD CREDITS ===============
