@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",                // local dev
-      "https://your-frontend-name.vercel.app" // update later when Vercel is live
+      "https://visora-psi.vercel.app" // update later when Vercel is live
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
