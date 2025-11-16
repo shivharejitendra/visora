@@ -144,10 +144,13 @@ const razorpayInstance = new Razorpay({
  */
 const paymentRazorpay = async (req, res) => {
   try {
+    // safely read auth header (may be undefined)
     const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : null;
+
+    let token = null;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1]?.trim();
+    }
 
     let userIdFromToken = null;
     if (token) {
@@ -155,10 +158,11 @@ const paymentRazorpay = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         userIdFromToken = decoded?.id;
       } catch (err) {
-        console.warn("Invalid JWT:", err.message);
+        console.warn("Invalid JWT in paymentRazorpay:", err.message);
       }
     }
 
+    // Accept either planId or plainId (backwards compatibility)
     const planIdRaw = req.body.planId || req.body.plainId;
     const userId = userIdFromToken || req.body.userId;
 
@@ -188,6 +192,7 @@ const paymentRazorpay = async (req, res) => {
         credits = 100;
         amount = 10;
         break;
+
       case "advance":
       case "advanced":
       case "advance-plan":
@@ -195,12 +200,14 @@ const paymentRazorpay = async (req, res) => {
         credits = 500;
         amount = 50;
         break;
+
       case "business":
       case "business-plan":
         plan = "Business";
         credits = 5000;
         amount = 250;
         break;
+
       default:
         return res
           .status(400)
@@ -244,6 +251,7 @@ const paymentRazorpay = async (req, res) => {
       .json({ success: false, message: error.message });
   }
 };
+
 
 // =============== VERIFY PAYMENT & ADD CREDITS ===============
 
